@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//AppBar 사용자 정의 함수(요구사항)
+//AppBar클래스 (요구사항)
 class _buildAppBar extends StatelessWidget implements PreferredSizeWidget {
   _buildAppBar({this.pageInstanceFunction});
   var pageInstanceFunction;
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() //Stateful 위젯이 이 위젯트리에 삽입될 때 한 번 호출되는 메서드, 초기화 작업 시 사용
   {
     super.initState();
-    _counter = 41; //★★★요구사항에 맞는지??????
+    _counter = 41;
   }
 
   void _incrementCounter() {
@@ -79,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(widget.title);
   }
 
+  //_buildBody() 사용자 정의 함수(요구사항)
   Widget _buildBody() {
     return Center(
       child: Column(
@@ -100,8 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
 
+    //_buildAppBar(), _buildBody()에 2가지 방법 존재
+    //1. 클래스로 생성하여 호출(하단 _buildAppBar())
+    //2. 위젯을 반환하는 함수를 생성하여 호출(하단 _buildBody())
     return Scaffold(
-      appBar: _buildAppBar( //★★★함수가 아니라 생성자....?
+      appBar: _buildAppBar(
         pageInstanceFunction: printTitle,
       ),
       body:_buildBody(),
