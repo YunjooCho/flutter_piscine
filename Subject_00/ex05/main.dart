@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poketmonster/poketmon_details.dart';
+import 'package:poketmonster/custom_widget/poketmon_details.dart';
 
 void main() => runApp(MyApp());
 
