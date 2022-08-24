@@ -35,6 +35,7 @@ class _RandomWordsState extends State<RandomWords> {
   final _biggerFont = const TextStyle(fontSize: 18);
   List<String> _subtitleContents = ['done', 'do not yet'];
   //final idx = Random().nextInt(2);
+  //final _displayContents = _subtitleContents[idx];
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,7 @@ class _RandomWordsState extends State<RandomWords> {
                     fontSize: 18,
                 )
             ),
-            subtitle: Text(_subtitleContents[idx]),
+            subtitle: Text(_displayContents),
             trailing: Icon(
               alreadySaved ? Icons.favorite : Icons.favorite_border,
               color: alreadySaved ? Colors.red : null,
