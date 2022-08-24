@@ -11,13 +11,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //scaffold제거(_RandomWordsState에서 설정)
     return MaterialApp(
-      title: 'Startup Name Generator',
+      title: 'ex02',
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      home: RandomWords(), // REMOVE Scaffold
+      home: RandomWords(),
     );
   }
 }
@@ -30,12 +29,10 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
+  final _cards = <OneCard>[]; //OneCard객체의 배열
+  //final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18);
-  List<String> _subtitleContents = ['done', 'do not yet'];
-  //final idx = Random().nextInt(2);
-  //final _displayContents = _subtitleContents[idx];
 
   @override
   Widget build(BuildContext context) {
@@ -43,64 +40,89 @@ class _RandomWordsState extends State<RandomWords> {
       appBar: AppBar(
         title: const Text('ex02'),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list),
-            onPressed: _pushSaved,
-            tooltip: 'Saved Suggestions',
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.list),
+        //     onPressed: _pushSaved,
+        //     tooltip: 'Saved Suggestions',
+        //   ),
+        // ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16.0),
         itemBuilder: (context, i) {
           final index = i;
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
+          if (index >= _cards.length) {
+            _cards.addAll(generateCard(10));
+            //_suggestions.addAll(generateWordPairs().take(10));
           }
 
-          final idx = Random().nextInt(2);
-          final _displayContents = _subtitleContents[idx];
-          final alreadySaved = _saved.contains(_suggestions[index]);
-          
-          return Card(
-            child: ListTile(
-            title: Text(
-                _suggestions[index].asPascalCase,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                )
-            ),
-            subtitle: Text(_displayContents),
-            trailing: Icon(
-              alreadySaved ? Icons.favorite : Icons.favorite_border,
-              color: alreadySaved ? Colors.red : null,
-              semanticLabel: alreadySaved ? 'Remove from saved' : 'Save',
-            ),
-            onTap: () {
-              setState(() {
-                if (alreadySaved) {
-                  _saved.remove(_suggestions[index]);
-                } else {
-                  _saved.add(_suggestions[index]);
-                }
-              });
-            },
-          ),
-            elevation: 2.0,
+          //String이 아닌 OneCard객체(객체배열에서 특정 index를 가리키므로 객체)
+          final oneCard = _cards[index];
+
+          //final alreadySaved = _saved.contains(_cards[index]);
+
+          return Dismissible(
+            key: ValueKey(oneCard.titleContents), //Key는 String Type
+            child: _makeCardTile(oneCard, index), //아직 값이 초기화되지 않음
           );
         },
       ),
     );
   }
 
-  void _pushSaved() { //Navigator스택에 즐겨찾기한 문장을 push(), pop()은 별도 구현필요없음
+  List<OneCard> generateCard(int length)
+  {
+    List<WordPair> _titleContents = generateWordPairs().take(length).toList();
+    List<String> _subtitleContents = ['done', 'do not yet'];
+    final idx = Random().nextInt(2);
+
+    return List<OneCard>.generate(
+        length, (index) => OneCard(
+            titleContents: _titleContents[index],
+            subtitleContents: _subtitleContents[idx],
+            favoriteShape: false,
+        )
+    );
+  }
+
+  Widget _makeCardTile(OneCard oneCard, int index)
+  {
+    return Card(
+        child: ListTile(
+          title: Text(oneCard.titleContents.asPascalCase, //객체에서 non-nullable
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+              )),
+          subtitle: Text(oneCard.subtitleContents),
+          trailing: Icon(
+            oneCard.favoriteShape ? Icons.favorite : Icons.favorite_border,
+            color: oneCard.favoriteShape ? Colors.red : null,
+            semanticLabel: oneCard.favoriteShape ? 'Remove from saved' : 'Save',
+          ),
+          onTap: () {
+            setState(() {
+              _cards[index] = oneCard.copyWith(favoriteShape: !oneCard.favoriteShape);
+              // if (oneCard.favoriteShape) {
+              //   _saved.remove(oneCard.titleContents.asPascalCase);
+              // } else {
+              //   _saved.add(oneCard.titleContents);
+              // }
+            });
+          },
+        ),
+        elevation: 2.0,
+    );
+  }
+
+  void _pushSaved() {
+    //Navigator스택에 즐겨찾기한 문장을 push(), pop()은 별도 구현필요없음
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) {
           final tiles = _saved.map(
-                (pair) {
+            (pair) {
               return ListTile(
                 title: Text(
                   pair.asPascalCase,
@@ -111,9 +133,9 @@ class _RandomWordsState extends State<RandomWords> {
           );
           final divided = tiles.isNotEmpty
               ? ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList()
+                  context: context,
+                  tiles: tiles,
+                ).toList()
               : <Widget>[];
 
           return Scaffold(
@@ -124,6 +146,35 @@ class _RandomWordsState extends State<RandomWords> {
           );
         },
       ),
+    );
+  }
+}
+
+class OneCard{
+  //멤버변수
+  final WordPair titleContents;
+  final String subtitleContents;
+  final bool favoriteShape;
+
+  //생성자
+  OneCard({
+    required this.titleContents,
+    required this.subtitleContents,
+    required this.favoriteShape
+  });
+
+  //함수
+  OneCard copyWith({
+    String? id,
+    WordPair? titleContents,
+    String? subtitleContents,
+    bool? favoriteShape
+  })
+  {
+    return OneCard( //함수의 반환타입이 클래스(null값이면 으론쪽 값을 대입)
+      titleContents: titleContents ?? this.titleContents,
+      subtitleContents: subtitleContents ?? this.subtitleContents,
+      favoriteShape: favoriteShape ?? this.favoriteShape,
     );
   }
 }
