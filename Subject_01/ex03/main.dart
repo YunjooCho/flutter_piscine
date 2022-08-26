@@ -64,6 +64,11 @@ class _RandomWordsState extends State<RandomWords> {
 
           return Dismissible(
             key: ValueKey(oneCard.titleContents), //Key는 String Type
+            background: showBackground(0),
+            secondaryBackground: showBackground(1),
+            onDismissed: (direction){
+              _cards.remove(oneCard);
+            },
             child: _makeCardTile(oneCard, index), //아직 값이 초기화되지 않음
           );
         },
@@ -116,6 +121,28 @@ class _RandomWordsState extends State<RandomWords> {
     );
   }
 
+  Widget showBackground(int direction) {
+   return Container(
+     margin: const EdgeInsets.all(4),
+     padding: const EdgeInsets.symmetric(horizontal: 10),
+     color: Colors.red,
+     child: Row(
+       mainAxisAlignment:
+        direction == 0 ? MainAxisAlignment.start : MainAxisAlignment.end,
+       children: [
+         Text('Remove',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15.0,
+            color: Colors.white,
+          ),
+         ),
+       ],
+     ),
+   );
+  }
+
+  //추후 다시 구현해보기
   void _pushSaved() {
     //Navigator스택에 즐겨찾기한 문장을 push(), pop()은 별도 구현필요없음
     Navigator.of(context).push(
