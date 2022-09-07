@@ -62,7 +62,7 @@ class MyPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     //★★★
-    movieList = MovieList.fromJson(movieData.elementAt(index));
+    movieList = MovieList.fromJson(movieData);
     //Map<String, String> movieMap = jsonDecode(movieData.elementAt(index));
 
     return Scaffold(
@@ -103,8 +103,8 @@ class MyPage extends StatelessWidget {
                 return Container(
                     child: Image.network(
                       //★★★
-                      movieData.elementAt(index).posterPath!,
-                      '',
+                      movieList.elementAt(index).posterPath!,
+                      //'',
                     ),
                 );
               },
