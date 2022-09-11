@@ -8,8 +8,8 @@ part of 'movie_page.dart';
 
 MovieList _$MovieListFromJson(Map<String, dynamic> json) {
   return MovieList(
-    list: (json['list'] as List<dynamic>?)
-        ?.map((e) => MoviePage.fromJson(e as Map<String, dynamic>))
+    list: (json['list'] as List<dynamic>)
+        .map((e) => MoviePage.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
 }

@@ -4,7 +4,7 @@ part 'movie_page.g.dart';
 
 @JsonSerializable()
 class MovieList{
-  List<MoviePage>? list;
+  List<MoviePage> list;
 
   MovieList({
     required this.list,

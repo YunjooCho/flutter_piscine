@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'custom_widget/movie_page.dart'; //★★★
+import 'custom_widget/movie_page.dart';
 
 //폰트 설정
 //[1] 원하는 폰트를 다운로드하여 assets/fonts 디렉토리 생성 후,
@@ -31,8 +30,7 @@ List<Map<String, String>> movieData = [
   {'posterPath' : '<https://image.tmdb.org/t/p/w500/w7PJ7fBEYOuaAMKfYa4zmw45v3N.jpg>'},
   {'posterPath' : '<https://image.tmdb.org/t/p/w500/AviYDX3NuuyVQdZoLmLxNKp3zm8.jpg>'},
 ];
-MovieList? movieList;
-//★★★
+
 
 void main() {
   runApp(const MyApp());
@@ -48,7 +46,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         fontFamily: 'text',
       ),
-      home: MyPage(title: 'Movie Poster'),
+      home: const MyPage(title: 'Movie Poster'),
     );
   }
 }
@@ -60,10 +58,9 @@ class MyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     //★★★
-    movieList = MovieList.fromJson(movieData);
-    //Map<String, String> movieMap = jsonDecode(movieData.elementAt(index));
+    Map<String, dynamic> map = {"list": movieData};
+    MovieList movieList = MovieList.fromJson(map);
 
     return Scaffold(
       appBar: AppBar(
@@ -76,36 +73,39 @@ class MyPage extends StatelessWidget {
         ),
         elevation: 0.0,
       ),
-      body: SingleChildScrollView(
+      body: SingleChildScrollView( //스크롤 작동하게 한 코드는 ScrollPhysics()이지만 이 코드가 없으면 화면 over
+        scrollDirection: Axis.vertical,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Center(
-              child: Text('Movie of the Week',
-              style: TextStyle(
-                fontSize: 50.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
+            const Center(
+              child: Text(
+                'Movie of the Week',
+                style: TextStyle(
+                  fontSize: 50.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
             ),
             GridView.builder(
-              scrollDirection: Axis.vertical,
+              physics: ScrollPhysics(), //스크롤 작동(스크롤 가능한 Widget의 물리적 특성)
               shrinkWrap: true,
-              itemCount: 20,
+              itemCount: 20, //item의 총 개수
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                //childAspectRatio: 1,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
+                crossAxisCount: 2,   //1개 행에 보여줄 item개수
+                childAspectRatio: 1, //item의 가로, 세로 비율(현재는 1:1)
+                mainAxisSpacing: 5,  //수평Padding
+                crossAxisSpacing: 5, //수직Padding
               ),
               itemBuilder: (BuildContext context, int index) {
+                // final String str =  movieData[index]['posterPath']!;
+                final String str = movieList.list.elementAt(index).posterPath;
                 return Container(
-                    child: Image.network(
-                      //★★★
-                      movieList.elementAt(index).posterPath!,
-                      //'',
-                    ),
+                  child: Image.network(
+                    fit: BoxFit.fitWidth, //사진크기 맞추기
+                    str.substring(1, str.length - 1),
+                  ),
                 );
               },
             ),
@@ -115,4 +115,3 @@ class MyPage extends StatelessWidget {
     );
   }
 }
-
